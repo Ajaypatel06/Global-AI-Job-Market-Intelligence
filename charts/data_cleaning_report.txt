@@ -1,0 +1,33 @@
+DATA CLEANING REPORT - job_postings
+============================================================
+Note: the raw file is a simulated dirty copy made by data_cleaning.py.
+
+1. ISSUES FOUND IN RAW DATA
+------------------------------------------------------------
+Total rows in raw export        : 51,250
+Exact duplicate rows             : 1,250
+Missing salary_min               : 1,526
+Missing salary_max               : 1,526
+Negative/zero salary entries     : 257
+Distinct country spellings       : 20 (should be 10)
+Distinct exp_level spellings      : 15 (should be 4)
+Rows with leading/trailing space  : 5,115
+Dates not in ISO yyyy-mm-dd format: 20,504
+
+2. CLEANING ACTIONS TAKEN
+------------------------------------------------------------
+- Dropped 1,250 exact duplicate rows
+- Standardized country names to 10 canonical values (was 20 distinct spellings)
+- Standardized exp_level to 4 canonical values (was 15 distinct spellings)
+- Trimmed stray whitespace on 5,000 title values
+- Reparsed 20,504 non-ISO dates (mixed dd-mm-yyyy / mm/dd/yyyy / dd/mm/yyyy) to yyyy-mm-dd
+- Nulled 250 impossible salary entries (<= 0) rather than keeping bad values
+- Imputed 1,741 missing salary values using the country+experience-level median (0 left unresolved due to sparse group)
+
+3. VALIDATION AGAINST ORIGINAL SOURCE
+------------------------------------------------------------
+Original clean source rows : 50,000
+Recovered cleaned rows     : 50,000
+Row count match            : YES
+Countries match canonical set: YES
+Exp levels match canonical set: YES

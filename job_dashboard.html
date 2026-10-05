@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Global AI Job Market Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0D0D1A;--surface:#111122;--card:#161628;--border:#1E1E3A;
+  --orange:#FF6B35;--cyan:#4ECDC4;--blue:#5B8DEF;--green:#52C97F;--red:#F15B5B;--gold:#F5C542;
+  --text:#E8E4F0;--muted:#6B6B90;--dim:#1A1A32
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex;height:100vh;overflow:hidden;font-size:13px}
+
+.sidebar{width:200px;min-width:200px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0}
+.logo{padding:20px 18px 18px;border-bottom:1px solid var(--border)}
+.logo h2{font-size:12px;font-weight:600;color:var(--text);line-height:1.5;letter-spacing:.2px}
+.logo p{font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:.8px;text-transform:uppercase}
+.nav{flex:1;padding:8px 0}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 18px;cursor:pointer;color:var(--muted);font-size:11.5px;border-left:2px solid transparent;transition:all .12s;letter-spacing:.1px}
+.nav-item:hover{color:var(--text);background:var(--dim)}
+.nav-item.active{color:var(--text);background:var(--dim);border-left-color:var(--orange)}
+.nav-item svg{width:14px;height:14px;opacity:.6;flex-shrink:0}
+.nav-item.active svg{opacity:1}
+.sidebar-foot{padding:14px 18px;border-top:1px solid var(--border);font-size:9px;color:var(--muted);line-height:1.8;letter-spacing:.5px}
+
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.page{display:none;padding:22px 24px 32px}
+.page.active{display:block}
+.ph{margin-bottom:18px}
+.ph h1{font-size:15px;font-weight:600;color:var(--text);letter-spacing:.2px}
+.ph p{font-size:10.5px;color:var(--muted);margin-top:3px}
+
+.filters{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.fl{font-size:9px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-right:2px}
+.fb{font-size:10px;padding:3px 10px;border-radius:2px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .12s;letter-spacing:.2px}
+.fb:hover{border-color:var(--orange);color:var(--text)}
+.fb.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.sep{width:1px;height:16px;background:var(--border);margin:0 6px}
+
+.kpis{display:grid;gap:10px;margin-bottom:16px}
+.k5{grid-template-columns:repeat(5,1fr)}
+.k4{grid-template-columns:repeat(4,1fr)}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--muted)}
+.kpi.o::before{background:var(--orange)}
+.kpi.c::before{background:var(--cyan)}
+.kpi.b::before{background:var(--blue)}
+.kpi.g::before{background:var(--green)}
+.kpi.r::before{background:var(--red)}
+.kpi-lbl{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.kpi-val{font-size:24px;font-weight:600;line-height:1;color:var(--text)}
+.kpi-val.o{color:var(--orange)} .kpi-val.c{color:var(--cyan)} .kpi-val.g{color:var(--green)}
+.kpi-hint{font-size:9.5px;color:var(--muted);margin-top:5px}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px}
+.full{margin-bottom:12px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px}
+.ct{font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;justify-content:space-between;align-items:baseline}
+.cs{font-size:9.5px;color:var(--muted);font-weight:400}
+.cw{position:relative;margin-top:12px}
+
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.8px}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--dim);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.up{color:var(--green)} .dn{color:var(--red)} .st{color:var(--cyan)}
+
+.htbl{width:100%;border-collapse:collapse;font-size:10.5px}
+.htbl th{padding:5px 8px;color:var(--muted);font-weight:500;text-align:center;font-size:9px;letter-spacing:.6px;border-bottom:1px solid var(--border)}
+.htbl th:first-child{text-align:left}
+.htbl td{padding:6px 8px;text-align:center;font-size:10px;font-weight:500}
+.htbl td:first-child{text-align:left;color:var(--muted);font-size:10px;font-weight:400}
+
+::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sim{font-size:9.5px;color:var(--muted);border:1px solid var(--border);border-left:2px solid var(--orange);padding:6px 10px;margin-bottom:14px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <h2>Global AI Job Market<br>Intelligence</h2>
+    <p>50,000 postings · 2021–2025<br><span style="color:var(--orange)">SIMULATED DATASET</span></p>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="go('p1')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Executive Overview
+    </div>
+    <div class="nav-item" onclick="go('p2')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Skill Demand
+    </div>
+    <div class="nav-item" onclick="go('p3')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Country × Skill
+    </div>
+    <div class="nav-item" onclick="go('p4')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Salary & Remote
+    </div>
+  </nav>
+  <div class="sidebar-foot">MySQL · job_market<br>5 tables · 440k+ rows<br>Simulated data · see README<br>Ajay Patel · Mumbai</div>
+</div>
+
+<div class="main">
+
+<!-- P1 EXECUTIVE OVERVIEW -->
+<div class="page active" id="p1">
+  <div class="ph"><h1>Executive Overview</h1><p>Global AI skill demand · 50,000 simulated postings · 10 countries · 25 skills · 2021–2025</p></div>
+  <div class="sim">Simulated data from job_generator.py, not real postings.</div>
+  <div class="kpis k5">
+    <div class="kpi o"><div class="kpi-lbl">Total Postings</div><div class="kpi-val">50,000</div><div class="kpi-hint">2021 – 2025</div></div>
+    <div class="kpi c"><div class="kpi-lbl">Countries</div><div class="kpi-val c">10</div><div class="kpi-hint">Global scope</div></div>
+    <div class="kpi b"><div class="kpi-lbl">Skills Tracked</div><div class="kpi-val">25</div><div class="kpi-hint">9 categories</div></div>
+    <div class="kpi g"><div class="kpi-lbl">LLM APIs Growth</div><div class="kpi-val g">+5,323%</div><div class="kpi-hint">1.1% → 58.6%</div></div>
+    <div class="kpi o"><div class="kpi-lbl">AI Salary Premium</div><div class="kpi-val o">+22%</div><div class="kpi-hint">LLM APIs top skill</div></div>
+  </div>
+  <div class="g21">
+    <div class="card">
+      <div class="ct">Top 5 Skill Demand Trends 2021–2025 <span class="cs">% of postings requiring skill</span></div>
+      <div class="cw"><canvas id="c1t" role="img" aria-label="Line chart of skill demand trends from 2021 to 2025 for Python, SQL, LLM APIs, Excel, and dbt">Trend data for Python, SQL, LLM APIs, Excel, dbt from 2021 to 2025.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Postings by Country <span class="cs">all years</span></div>
+      <div class="cw"><canvas id="c1d" role="img" aria-label="Donut chart showing job postings split by country">Country distribution of 50,000 simulated postings.</canvas></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Postings by Sector <span class="cs">2025</span></div>
+      <div class="cw"><canvas id="c1s" role="img" aria-label="Bar chart of postings by sector in 2025">Sector breakdown for 2025 postings.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Key Skill Summary <span class="cs">2021 vs 2025</span></div>
+      <table class="tbl" style="margin-top:10px">
+        <thead><tr><th>Skill</th><th>2021</th><th>2025</th><th>Change</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>LLM APIs</td><td>1.1%</td><td>58.6%</td><td class="up">+57.5pp</td><td class="up">Explosive</td></tr>
+          <tr><td>Python</td><td>46.0%</td><td>91.3%</td><td class="up">+45.3pp</td><td class="up">Growing</td></tr>
+          <tr><td>SQL</td><td>88.0%</td><td>89.5%</td><td class="st">+1.5pp</td><td class="st">Stable</td></tr>
+          <tr><td>dbt</td><td>2.1%</td><td>30.1%</td><td class="up">+28.0pp</td><td class="up">Rising fast</td></tr>
+          <tr><td>Excel</td><td>92.7%</td><td>69.2%</td><td class="dn">−23.5pp</td><td class="dn">Declining</td></tr>
+          <tr><td>VBA/Macros</td><td>31.0%</td><td>7.8%</td><td class="dn">−23.2pp</td><td class="dn">Near obsolete</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- P2 SKILL DEMAND -->
+<div class="page" id="p2">
+  <div class="ph"><h1>Skill Demand Intelligence</h1><p>2021 vs 2025 comparison · fastest growing and declining · skill × year matrix</p></div>
+  <div class="sim">Simulated data from job_generator.py, not real postings.</div>
+  <div class="card full">
+    <div class="ct">Demand 2021 vs 2025 - All Skills <span class="cs">sorted by 2025 demand · % of postings</span></div>
+    <div class="cw" style="height:220px"><canvas id="c2b" role="img" aria-label="Grouped bar chart comparing 2021 and 2025 demand for all 25 tracked skills">Skill demand comparison 2021 vs 2025.</canvas></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Top 8 Fastest Growing <span class="cs">pp change 2021→2025</span></div>
+      <div class="cw" style="height:220px"><canvas id="c2g" role="img" aria-label="Horizontal bar chart of top 8 fastest growing skills">LLM APIs +57.5pp, Python +45.3pp and more.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Fastest Declining <span class="cs">pp change 2021→2025</span></div>
+      <div class="cw" style="height:220px"><canvas id="c2d" role="img" aria-label="Horizontal bar chart of fastest declining skills">Excel -23.5pp, VBA -23.2pp and more.</canvas></div>
+    </div>
+  </div>
+  <div class="card full">
+    <div class="ct">Skill × Year Demand Matrix <span class="cs">% of postings · colour: low=red, high=green</span></div>
+    <table class="htbl" id="p2mat" style="margin-top:12px"></table>
+  </div>
+</div>
+
+<!-- P3 COUNTRY HEATMAP -->
+<div class="page" id="p3">
+  <div class="ph"><h1>Country × Skill Heatmap</h1><p>Regional AI skill adoption · % of 2025 postings in each country requiring each skill</p></div>
+  <div class="sim">Simulated data from job_generator.py, not real postings.</div>
+  <div class="kpis k4">
+    <div class="kpi o"><div class="kpi-lbl">Highest LLM APIs</div><div class="kpi-val o">USA</div><div class="kpi-hint">66.2% of postings</div></div>
+    <div class="kpi c"><div class="kpi-lbl">India LLM APIs 2025</div><div class="kpi-val c">53.8%</div><div class="kpi-hint">12.4pp behind USA</div></div>
+    <div class="kpi g"><div class="kpi-lbl">USA vs India Gap</div><div class="kpi-val g">+12.4pp</div><div class="kpi-hint">LLM APIs demand</div></div>
+    <div class="kpi b"><div class="kpi-lbl">Most Stable Skill</div><div class="kpi-val">SQL</div><div class="kpi-hint">86.9–91.1% in every country</div></div>
+  </div>
+  <div class="card full">
+    <div class="ct">Country × Skill Demand Heatmap <span class="cs">% of 2025 postings · all 10 countries · key skills</span></div>
+    <table class="htbl" id="p3mat" style="margin-top:12px"></table>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Country Ranking - LLM APIs 2025 <span class="cs">% of postings</span></div>
+      <div class="cw" style="height:220px"><canvas id="c3l" role="img" aria-label="Bar chart ranking countries by LLM APIs demand in 2025">USA leads at 66.2%, India at 53.8%.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">USA vs India vs UK - Python & LLM APIs <span class="cs">2021–2025</span></div>
+      <div class="cw" style="height:220px"><canvas id="c3c" role="img" aria-label="Line chart comparing Python and LLM APIs demand in USA, India, and UK from 2021 to 2025">Country comparison trend lines for two key skills.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- P4 SALARY & REMOTE -->
+<div class="page" id="p4">
+  <div class="ph"><h1>Salary & Remote Work</h1><p>AI skill salary premium · demand vs premium scatter · remote/hybrid/onsite trend 2021–2025</p></div>
+  <div class="sim">Simulated data from job_generator.py, not real postings.</div>
+  <div class="kpis k4">
+    <div class="kpi g"><div class="kpi-lbl">Top Salary Premium</div><div class="kpi-val g">+22%</div><div class="kpi-hint">LLM APIs</div></div>
+    <div class="kpi c"><div class="kpi-lbl">Avg AI Premium</div><div class="kpi-val c">+17%</div><div class="kpi-hint">across AI/ML skills</div></div>
+    <div class="kpi o"><div class="kpi-lbl">Hybrid Work 2025</div><div class="kpi-val o">44.9%</div><div class="kpi-hint">up from 24.6% in 2021</div></div>
+    <div class="kpi b"><div class="kpi-lbl">Remote Work 2025</div><div class="kpi-val">18.7%</div><div class="kpi-hint">down from 21.6% peak (2023)</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Salary Premium by AI Skill <span class="cs">% above baseline analyst salary</span></div>
+      <div class="cw" style="height:230px"><canvas id="c4s" role="img" aria-label="Horizontal bar chart of salary premium by AI skill">LLM APIs +22%, Deep Learning +20%, Machine Learning +18%.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Skill Demand Growth vs Salary Premium <span class="cs">bubble = total 2025 postings</span></div>
+      <div class="cw" style="height:230px"><canvas id="c4sc" role="img" aria-label="Bubble scatter chart comparing demand growth and salary premium">Scatter showing relationship between growth and premium.</canvas></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Remote / Hybrid / Onsite Trend <span class="cs">% of postings by work type 2021–2025</span></div>
+      <div class="cw" style="height:180px"><canvas id="c4r" role="img" aria-label="Stacked bar chart of remote hybrid onsite trend from 2021 to 2025">Hybrid grew from 25% to 45%, onsite fell from 60% to 36%.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Country × Experience Salary Midpoint <span class="cs">USD · roles requiring Python / LLM APIs / ML · 2025</span></div>
+      <table class="htbl" id="p4mat" style="margin-top:12px"></table>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  ['p1','p2','p3','p4'].forEach((p,i)=>{if(p===id)document.querySelectorAll('.nav-item')[i].classList.add('active')});
+}
+document.querySelectorAll('.fb').forEach(b=>{
+  b.addEventListener('click',function(){this.classList.toggle('on')});
+});
+
+const O='#FF6B35',C='#4ECDC4',B='#5B8DEF',G='#52C97F',R='#F15B5B',GD='#F5C542',GR='#6B6B90';
+const GRID='rgba(30,30,58,0.9)';
+Chart.defaults.color=GR; Chart.defaults.borderColor='#1E1E3A'; Chart.defaults.font.family='Inter'; Chart.defaults.font.size=10;
+
+const yrs=[2021,2022,2023,2024,2025];
+const TD={
+  Python:[46.0, 59.9, 72.2, 84.8, 91.3],
+  SQL:[88.0, 88.2, 88.6, 89.5, 89.5],
+  'LLM APIs':[1.1, 4.6, 19.4, 41.3, 58.6],
+  Excel:[92.7, 90.7, 86.0, 76.8, 69.2],
+  dbt:[2.1, 6.8, 15.7, 23.2, 30.1],
+};
+const TC={Python:O,SQL:C,'LLM APIs':GD,Excel:GR,dbt:G};
+
+function mkLine(id,labels,datasets,opts={}){
+  return new Chart(document.getElementById(id),{type:'line',
+    data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},...(opts.plugins||{})},
+      scales:{x:{grid:{display:false},ticks:{color:GR}},y:{grid:{color:GRID},ticks:{callback:v=>v+'%',color:GR},beginAtZero:false,...(opts.y||{})}},
+      ...opts}});
+}
+function mkBar(id,labels,data,color,horiz=false,opts={}){
+  return new Chart(document.getElementById(id),{type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:color,borderRadius:3,barThickness:horiz?16:18}]},
+    options:{indexAxis:horiz?'y':'x',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:horiz?{color:GRID}:{display:false},ticks:{color:GR,...(opts.xt||{})}},
+        y:{grid:horiz?{display:false}:{color:GRID},ticks:{color:GR,...(opts.yt||{})}}
+      },...opts}});
+}
+
+// P1
+mkLine('c1t',yrs,Object.entries(TD).map(([s,d])=>({
+  label:s,data:d,borderColor:TC[s],borderWidth:s==='Python'||s==='LLM APIs'?2.5:1.6,
+  tension:.4,fill:false,pointRadius:3,pointHoverRadius:5,
+  borderDash:s==='Excel'||s==='dbt'?[4,3]:[],
+})),{plugins:{legend:{display:true,position:'top',labels:{boxWidth:8,padding:14,usePointStyle:true,pointStyleWidth:8}}},y:{min:0,max:100}});
+
+new Chart(document.getElementById('c1d'),{type:'doughnut',
+  data:{labels:['India','USA','UK','UAE','Singapore','Canada','Australia','Germany','Netherlands','France'],
+    datasets:[{data:[5035, 4883, 5033, 4924, 5096, 4959, 5024, 4992, 4999, 5055],
+      backgroundColor:[O,C,B,G,'#DDA0DD',GD,'#FFA07A','#8BC8A0','#87CEEB','#C0A0C0'],
+      borderWidth:0,hoverOffset:6}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+    plugins:{legend:{position:'right',labels:{boxWidth:8,padding:8,font:{size:9},color:GR}}}}
+});
+
+mkBar('c1s',["Media", "Finance", "Logistics", "Healthcare", "Technology", "Manufacturing", "Retail"],
+  [1681, 1454, 1450, 1429, 1359, 1348, 1279],[O,C,B,G,GR,'#DDA0DD','#FFA07A'],false,
+  {xt:{font:{size:9},maxRotation:20}});
+
+// P2
+const sk25=["Python", "SQL", "Pandas/NumPy", "Excel", "Git", "Power BI", "Machine Learning", "LLM APIs", "Cloud", "scikit-learn", "NLP", "Tableau", "TF/PyTorch", "Deep Learning", "Docker", "Spark", "dbt", "Airflow", "Power Automate", "Looker", "R", "Alteryx", "SAS", "VBA/Macros", "MATLAB"];
+const d21=  [46.0, 88.0, 36.5, 92.7, 41.3, 36.1, 34.5, 1.1, 25.7, 23.3, 15.8, 43.1, 19.0, 18.8, 12.3, 16.4, 2.1, 8.6, 10.0, 7.9, 29.0, 18.8, 23.0, 31.0, 12.2];
+const d25=  [91.3, 89.5, 70.0, 69.2, 64.8, 59.5, 59.0, 58.6, 53.1, 48.7, 43.1, 39.6, 38.0, 37.4, 35.5, 34.7, 30.1, 27.1, 27.1, 22.5, 18.6, 14.2, 11.3, 7.8, 6.4];
+const sorted=sk25.map((s,i)=>({s,a:d21[i],b:d25[i]})).sort((x,y)=>y.b-x.b);
+
+new Chart(document.getElementById('c2b'),{type:'bar',
+  data:{labels:sorted.map(x=>x.s),
+    datasets:[
+      {label:'2021',data:sorted.map(x=>x.a),backgroundColor:'rgba(107,107,144,0.55)',borderRadius:2,barThickness:9},
+      {label:'2025',data:sorted.map(x=>x.b),backgroundColor:O,borderRadius:2,barThickness:9}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{boxWidth:8,padding:12,color:GR,font:{size:10}}}},
+    scales:{x:{grid:{display:false},ticks:{color:GR,font:{size:8},maxRotation:38,autoSkip:false}},
+            y:{grid:{color:GRID},ticks:{callback:v=>v+'%',color:GR}}}}
+});
+
+mkBar('c2g',["LLM APIs", "Python", "Pandas/NumPy", "dbt", "Cloud", "NLP", "scikit-learn", "Machine Learning"],
+  [57.5, 45.3, 33.5, 28.0, 27.4, 27.3, 25.4, 24.5],G,true,
+  {xt:{callback:v=>'+'+v+'pp'}});
+mkBar('c2d',["Excel", "VBA/Macros", "SAS", "R", "MATLAB", "Alteryx"],
+  [-23.5, -23.2, -11.7, -10.4, -5.8, -4.6],R,true,
+  {xt:{callback:v=>v+'pp'}});
+
+// matrix
+const matSk=["Python", "SQL", "LLM APIs", "Excel", "dbt", "Cloud", "VBA/Macros"];
+const matD={"Python":[46.0, 59.9, 72.2, 84.8, 91.3],"SQL":[88.0, 88.2, 88.6, 89.5, 89.5],"LLM APIs":[1.1, 4.6, 19.4, 41.3, 58.6],"Excel":[92.7, 90.7, 86.0, 76.8, 69.2],"dbt":[2.1, 6.8, 15.7, 23.2, 30.1],"Cloud":[25.7, 33.6, 41.4, 48.4, 53.1],"VBA/Macros":[31.0, 23.3, 15.6, 10.2, 7.8]};
+function hc(v){if(v>=80)return'rgba(82,201,127,0.55)';if(v>=55)return'rgba(82,201,127,0.30)';if(v>=30)return'rgba(255,107,53,0.28)';return'rgba(241,91,91,0.38)';}
+const m2=document.getElementById('p2mat');
+m2.innerHTML=`<thead><tr><th>Skill</th>${yrs.map(y=>`<th>${y}</th>`).join('')}</tr></thead><tbody></tbody>`;
+const m2b=m2.querySelector('tbody');
+matSk.forEach(sk=>{m2b.innerHTML+=`<tr><td>${sk}</td>${yrs.map((_,i)=>{const v=matD[sk][i];return`<td style="background:${hc(v)};color:var(--text)">${v}%</td>`}).join('')}</tr>`;});
+
+// P3
+const countries=["USA", "Singapore", "UK", "Australia", "Netherlands", "UAE", "Germany", "Canada", "India", "France"];
+const hsk=["Python", "SQL", "LLM APIs", "Machine Learning", "Cloud", "Power BI", "dbt"];
+const hd={"USA": [91.2, 90.8, 66.2, 65.1, 53.2, 58.9, 31.9], "Singapore": [91.4, 86.9, 64.1, 62.2, 50.6, 59.7, 30.5], "UK": [90.2, 90.7, 62.5, 61.5, 51.1, 58.4, 32.1], "Australia": [92.9, 87.6, 57.9, 61.1, 55.4, 61.8, 29.0], "Netherlands": [90.6, 88.3, 57.6, 56.5, 53.0, 60.0, 31.9], "UAE": [91.7, 91.1, 56.9, 54.5, 56.9, 58.1, 30.8], "Germany": [92.1, 90.7, 56.6, 57.6, 53.3, 60.2, 30.4], "Canada": [90.9, 88.8, 55.9, 59.8, 51.0, 60.6, 30.9], "India": [90.5, 90.2, 53.8, 54.6, 52.7, 58.1, 26.1], "France": [91.5, 89.9, 53.5, 56.5, 54.1, 59.0, 27.5]};
+function hc3(v){if(v>=85)return'rgba(78,205,196,0.55)';if(v>=60)return'rgba(78,205,196,0.28)';if(v>=35)return'rgba(255,107,53,0.30)';return'rgba(241,91,91,0.38)';}
+const m3=document.getElementById('p3mat');
+m3.innerHTML=`<thead><tr><th>Country</th>${hsk.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody></tbody>`;
+const m3b=m3.querySelector('tbody');
+countries.forEach(co=>{m3b.innerHTML+=`<tr><td>${co}</td>${hd[co].map(v=>`<td style="background:${hc3(v)};color:var(--text)">${v}%</td>`).join('')}</tr>`;});
+
+mkBar('c3l',countries,[66.2, 64.1, 62.5, 57.9, 57.6, 56.9, 56.6, 55.9, 53.8, 53.5],
+  [66.2, 64.1, 62.5, 57.9, 57.6, 56.9, 56.6, 55.9, 53.8, 53.5].map(v=>v>=62?O:v>=57?C:GR),false,
+  {xt:{font:{size:9},maxRotation:30},yt:{callback:v=>v+'%',min:48,max:68}});
+
+mkLine('c3c',yrs,[
+  {label:'USA - Python',data:[48.4, 59.0, 71.9, 84.4, 91.2],borderColor:O,borderWidth:2,tension:.4,fill:false,pointRadius:3},
+  {label:'India - Python',data:[44.8, 61.5, 74.7, 83.8, 90.5],borderColor:O,borderWidth:1.5,borderDash:[5,3],tension:.4,fill:false,pointRadius:3},
+  {label:'UK - Python',data:[45.0, 62.3, 72.4, 85.2, 90.2],borderColor:O,borderWidth:1.2,borderDash:[2,5],tension:.4,fill:false,pointRadius:3},
+  {label:'USA - LLM APIs',data:[0.9, 5.1, 21.2, 45.3, 66.2],borderColor:C,borderWidth:2,tension:.4,fill:false,pointRadius:3},
+  {label:'India - LLM APIs',data:[1.2, 4.3, 17.4, 35.9, 53.8],borderColor:C,borderWidth:1.5,borderDash:[5,3],tension:.4,fill:false,pointRadius:3},
+  {label:'UK - LLM APIs',data:[1.2, 4.7, 19.4, 43.0, 62.5],borderColor:C,borderWidth:1.2,borderDash:[2,5],tension:.4,fill:false,pointRadius:3},
+],{plugins:{legend:{display:true,position:'top',labels:{boxWidth:8,padding:10,font:{size:9},usePointStyle:true}}},y:{min:0,max:100}});
+
+// P4
+mkBar('c4s',["LLM APIs", "Deep Learning", "TF/PyTorch", "Machine Learning", "NLP", "dbt", "Spark", "Airflow"],
+  [22.0, 20.0, 19.0, 18.0, 17.0, 15.0, 14.0, 13.0],
+  [22.0, 20.0, 19.0, 18.0, 17.0, 15.0, 14.0, 13.0].map(v=>v>=20?GD:v>=16?C:GR),true,
+  {xt:{callback:v=>'+'+v+'%'}});
+
+new Chart(document.getElementById('c4sc'),{type:'bubble',
+  data:{datasets:[
+    {label:"LLM APIs",data:[{x:57.5,y:22.0,r:15.0}],backgroundColor:'rgba(245,197,66,0.75)'},
+    {label:"Deep Learning",data:[{x:18.6,y:20.0,r:11.7}],backgroundColor:'rgba(221,160,221,0.75)'},
+    {label:"TF/PyTorch",data:[{x:19.0,y:19.0,r:11.8}],backgroundColor:'rgba(91,141,239,0.75)'},
+    {label:"Machine Learning",data:[{x:24.5,y:18.0,r:15.0}],backgroundColor:'rgba(91,141,239,0.75)'},
+    {label:"NLP",data:[{x:27.3,y:17.0,r:12.6}],backgroundColor:'rgba(82,201,127,0.75)'},
+    {label:"dbt",data:[{x:28.0,y:15.0,r:10.6}],backgroundColor:'rgba(78,205,196,0.75)'},
+    {label:"Spark",data:[{x:18.3,y:14.0,r:11.3}],backgroundColor:'rgba(150,200,180,0.75)'},
+    {label:"Airflow",data:[{x:18.5,y:13.0,r:10.1}],backgroundColor:'rgba(255,107,53,0.75)'},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'right',labels:{boxWidth:8,padding:6,font:{size:9},color:GR}}},
+    scales:{
+      x:{grid:{color:GRID},title:{display:true,text:'Demand Change pp (2021→2025)',color:GR,font:{size:9}},ticks:{color:GR}},
+      y:{grid:{color:GRID},title:{display:true,text:'Salary Premium %',color:GR,font:{size:9}},min:10,max:25,ticks:{color:GR,callback:v=>'+'+v+'%'}}
+    }}
+});
+
+new Chart(document.getElementById('c4r'),{type:'bar',
+  data:{labels:yrs,datasets:[
+    {label:'Remote', data:[14.8, 20.2, 21.6, 20.5, 18.7],backgroundColor:O,borderRadius:2},
+    {label:'Hybrid', data:[24.6, 31.6, 37.9, 41.9, 44.9],backgroundColor:C,borderRadius:2},
+    {label:'Onsite', data:[60.6, 48.2, 40.5, 37.6, 36.4],backgroundColor:GR,borderRadius:2},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{boxWidth:8,padding:12,color:GR,font:{size:10}}}},
+    scales:{x:{stacked:true,grid:{display:false},ticks:{color:GR}},y:{stacked:true,grid:{color:GRID},ticks:{callback:v=>v+'%',color:GR}}}}
+});
+
+const smc=['India','USA','UK','UAE','Singapore'];
+const sme=['Junior','Mid','Senior','Lead'];
+const smd={"India": [8043, 13987, 22073, 32438], "USA": [65578, 95203, 135983, 174635], "UK": [44955, 67742, 95013, 122990], "UAE": [38013, 57935, 82552, 108832], "Singapore": [42254, 65144, 92424, 119908]};
+function fs(v){return '$'+Math.round(v/1000)+'k';}
+const pm=document.getElementById('p4mat');
+pm.innerHTML=`<thead><tr><th>Country</th>${sme.map(e=>`<th>${e}</th>`).join('')}</tr></thead><tbody></tbody>`;
+const pmb=pm.querySelector('tbody');
+smc.forEach(co=>{
+  const vals=smd[co]; const mx=Math.max(...vals);
+  pmb.innerHTML+=`<tr><td>${co}</td>${vals.map(v=>{
+    const r=v/mx;
+    const bg=r>=0.8?'rgba(82,201,127,0.35)':r>=0.5?'rgba(78,205,196,0.25)':r>=0.3?'rgba(255,107,53,0.18)':'rgba(30,30,58,0.5)';
+    return`<td style="background:${bg};color:var(--text)">${fs(v)}</td>`;
+  }).join('')}</tr>`;
+});
+</script>
+</body>
+</html>

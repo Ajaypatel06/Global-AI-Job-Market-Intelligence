@@ -1,0 +1,6 @@
+data/job_postings_raw_dirty.csv
+data/job_postings_cleaned.csv
+data/job_market.db
+facts.json
+__pycache__/
+*.pyc

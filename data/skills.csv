@@ -1,0 +1,26 @@
+skill_id,skill_name,category
+1,Python,Programming
+2,SQL,Programming
+3,Excel,Spreadsheet
+4,Power BI,Visualization
+5,Tableau,Visualization
+6,R,Programming
+7,VBA/Macros,Spreadsheet
+8,LLM APIs,AI/ML
+9,Machine Learning,AI/ML
+10,Deep Learning,AI/ML
+11,NLP,AI/ML
+12,scikit-learn,AI/ML
+13,TensorFlow/PyTorch,AI/ML
+14,Cloud (AWS/GCP/Azure),Cloud
+15,dbt,Data Engineering
+16,Spark,Data Engineering
+17,Airflow,Data Engineering
+18,Git,DevOps
+19,Docker,DevOps
+20,Pandas/NumPy,Programming
+21,Looker,Visualization
+22,Alteryx,Analytics
+23,SAS,Analytics
+24,MATLAB,Analytics
+25,Power Automate,Automation
