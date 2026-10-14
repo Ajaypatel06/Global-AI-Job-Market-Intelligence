@@ -1,5 +1,3 @@
--- mysql_queries.sql: the 10 queries (MySQL 8.0+, they use CTEs)
--- run USE job_market; first
 
 -- Q1: skill demand trend, 2021 to 2025
 
