@@ -1,6 +1,4 @@
--- mysql_schema.sql  (MySQL 8.0+)
--- Creates the job_market database and the 5 tables.
--- Run this first, or let load_mysql.py run it for you.
+
 
 CREATE DATABASE IF NOT EXISTS job_market
     DEFAULT CHARACTER SET utf8mb4
