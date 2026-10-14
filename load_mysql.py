@@ -1,7 +1,4 @@
-# load_mysql.py - creates the job_market database and loads the CSVs from data/
-# run after job_generator.py
-# password: set the MYSQL_PASSWORD env variable or type it when asked
-# (MYSQL_HOST, MYSQL_PORT and MYSQL_USER also work, defaults are localhost, 3306, root)
+
 
 import os, csv, sys, time, getpass
 import pymysql
